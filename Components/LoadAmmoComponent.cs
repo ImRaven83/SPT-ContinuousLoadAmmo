@@ -17,11 +17,11 @@ namespace ContinuousLoadAmmo.Components;
 public class LoadAmmoComponent : InputNode
 {
     private readonly List<GridItemView> _gridItemViews = [];
-    private readonly List<AmmoItemClass> _ammoItems = [];
+    private readonly List<Ammo> _ammoItems = [];
     private readonly HashSet<MongoID> _seenAmmoTplScratch = [];
     private LoadAmmoController _loadAmmoControllerController;
-    private TaskCompletionSource<AmmoItemClass> _chosenAmmoTcs;
-    private GClass3450 _emptySourceContext = new();
+    private TaskCompletionSource<Ammo> _chosenAmmoTcs;
+    private EmptyItemContext _emptySourceContext = new();
 
     public bool IsShown => _chosenAmmoTcs is not null;
 
@@ -173,13 +173,13 @@ public class LoadAmmoComponent : InputNode
         }
     }
 
-    private bool ShouldRemoveFromList(AmmoItemClass ammo)
+    private bool ShouldRemoveFromList(Ammo ammo)
     {
         return !_seenAmmoTplScratch.Add(ammo.TemplateId);
     }
 
     [SuppressMessage("Usage", "VSTHRD003:Avoid awaiting foreign Tasks")]
-    private Task<AmmoItemClass> ShowAcceptableAmmoAsync(List<AmmoItemClass> foundAmmo, InventoryController inventoryController) // method_5
+    private Task<Ammo> ShowAcceptableAmmoAsync(List<Ammo> foundAmmo, InventoryController inventoryController) // method_5
     {
         foreach (var ammo in foundAmmo)
         {
@@ -206,18 +206,18 @@ public class LoadAmmoComponent : InputNode
         HighlightIndex(_index, 0);
 
         SetChosenAmmo(null);
-        _chosenAmmoTcs = new TaskCompletionSource<AmmoItemClass>();
+        _chosenAmmoTcs = new TaskCompletionSource<Ammo>();
 
         return _chosenAmmoTcs.Task;
     }
 
-    private void SetChosenAmmo(AmmoItemClass ammo)
+    private void SetChosenAmmo(Ammo ammo)
     {
         _chosenAmmoTcs?.SetResult(ammo);
         _chosenAmmoTcs = null;
     }
 
-    private AmmoItemClass GetSelectedAmmo()
+    private Ammo GetSelectedAmmo()
     {
         return _index == _ammoItems.Count
                    ? null // Cancel/no option is selected
@@ -248,7 +248,7 @@ public class LoadAmmoComponent : InputNode
         Index = ((Index - 1) + num) % num;
     }
 
-    private void AddCancelView(AmmoItemClass templateItem, InventoryController inventoryController)
+    private void AddCancelView(Ammo templateItem, InventoryController inventoryController)
     {
         var cancelView = GridItemView.Create(
             templateItem,

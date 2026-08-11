@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading;
 using ContinuousLoadAmmo.Utils;
 using EFT.InventoryLogic;
@@ -19,7 +18,7 @@ public class LoadAmmoUI
     private Transform _loadUITransform;
     private ItemViewLoadAmmoComponent _itemViewLoadAmmoComponent;
     private Image _magImage;
-    private GClass929 _imageLoader;
+    private ItemIcon _imageLoader;
     private Action _unbindImageLoader;
     private TextMeshProUGUI _magValue;
 
@@ -75,20 +74,13 @@ public class LoadAmmoUI
     {
         var gridItemView = ItemViewFactory.CreateFromPrefab<GridItemView>("grid_layout");
 
-        var itemViewAnimationField = typeof(ItemView).GetField("Animator", BindingFlags.Instance | BindingFlags.NonPublic);
-        var itemViewAnimation = (ItemViewAnimation)itemViewAnimationField!.GetValue(gridItemView);
+        var itemViewAnimation = gridItemView.Animator;
 
-        var itemViewLoadAmmoComponentTemplateField = typeof(ItemViewAnimation).GetField(
-            "_loadAmmoComponentTemplate",
-            BindingFlags.Instance | BindingFlags.NonPublic
-        );
-        var itemViewLoadAmmoComponentTemplate =
-            (ItemViewLoadAmmoComponent)itemViewLoadAmmoComponentTemplateField!.GetValue(itemViewAnimation);
+        var itemViewLoadAmmoComponentTemplate = itemViewAnimation._loadAmmoComponentTemplate;
         _itemViewLoadAmmoComponent = Object.Instantiate(itemViewLoadAmmoComponentTemplate, _loadUITransform, false);
         SetUI(_itemViewLoadAmmoComponent.transform, new Vector2(0f, -150f), new Vector3(1.5f, 1.5f, 1.5f));
 
-        var itemViewBottomPanelField = typeof(ItemView).GetField("BottomPanel", BindingFlags.Instance | BindingFlags.NonPublic);
-        var itemViewBottomPanelTemplate = (ItemViewBottomPanel)itemViewBottomPanelField?.GetValue(gridItemView);
+        var itemViewBottomPanelTemplate = gridItemView.BottomPanel;
         _magValue = Object.Instantiate(itemViewBottomPanelTemplate!.ItemValue, _loadUITransform, false);
         SetUI(_magValue.transform, new Vector2(0f, -190f));
         _magValue.enableWordWrapping = false;
@@ -173,5 +165,5 @@ public class LoadAmmoUI
     }
 
     private static readonly AccessTools.FieldRef<ItemViewLoadAmmoComponent, CancellationTokenSource> _itemViewLoadAmmoCtsField =
-        AccessTools.FieldRefAccess<ItemViewLoadAmmoComponent, CancellationTokenSource>("cancellationTokenSource_0");
+        AccessTools.FieldRefAccess<ItemViewLoadAmmoComponent, CancellationTokenSource>("_taskCancellation");
 }
