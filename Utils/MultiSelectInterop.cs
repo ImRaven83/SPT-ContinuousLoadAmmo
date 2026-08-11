@@ -33,8 +33,7 @@ internal static class MultiSelectInterop
     {
         if (_uiFixesLoaded.HasValue) return _uiFixesLoaded.Value;
 
-        var present = Chainloader.PluginInfos.TryGetValue("Tyfon.UIFixes", out var pluginInfo) // TODO: Remove in 4.1.x
-                      || Chainloader.PluginInfos.TryGetValue("com.tyfon.uifixes", out pluginInfo);
+        var present = Chainloader.PluginInfos.TryGetValue("com.tyfon.uifixes", out var pluginInfo);
         var correctVersion = present && pluginInfo.Metadata.Version >= _requiredVersion;
         _uiFixesLoaded = present && correctVersion;
 
